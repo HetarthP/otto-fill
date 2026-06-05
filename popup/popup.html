@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JobFill AI</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header>
+        <h1>JobFill AI</h1>
+        <p>Private application helper</p>
+      </header>
+
+      <section class="actions" aria-label="JobFill AI actions">
+        <button id="scan-page" type="button">Scan Page</button>
+        <button id="open-options" type="button" class="secondary">Open Profile Settings</button>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <p id="status">Ready to scan this page.</p>
+        <ul id="field-list"></ul>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

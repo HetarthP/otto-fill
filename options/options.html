@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JobFill AI Profile Settings</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main class="page-shell">
+      <header>
+        <h1>Profile Settings</h1>
+        <p>Your profile stays in chrome.storage.local on this device.</p>
+      </header>
+
+      <form id="profile-form">
+        <section class="form-grid" aria-label="Profile fields">
+          <label>
+            Full name
+            <input id="fullName" name="fullName" autocomplete="name">
+          </label>
+
+          <label>
+            Email
+            <input id="email" name="email" type="email" autocomplete="email">
+          </label>
+
+          <label>
+            Phone
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
+          </label>
+
+          <label>
+            LinkedIn
+            <input id="linkedin" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/...">
+          </label>
+
+          <label>
+            GitHub
+            <input id="github" name="github" type="url" placeholder="https://github.com/...">
+          </label>
+
+          <label>
+            Portfolio
+            <input id="portfolio" name="portfolio" type="url" placeholder="https://...">
+          </label>
+
+          <label class="span-full">
+            Address
+            <textarea id="address" name="address" rows="3" autocomplete="street-address"></textarea>
+          </label>
+
+          <label>
+            School
+            <input id="school" name="school" autocomplete="organization">
+          </label>
+
+          <label>
+            Degree
+            <input id="degree" name="degree">
+          </label>
+
+          <label>
+            Graduation year
+            <input id="graduationYear" name="graduationYear" inputmode="numeric" maxlength="4">
+          </label>
+        </section>
+
+        <div class="form-actions">
+          <button type="submit">Save Profile</button>
+          <button id="clear-profile" type="button" class="secondary">Clear Profile</button>
+        </div>
+
+        <p id="status" role="status" aria-live="polite"></p>
+      </form>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JobFill AI Manual Test Form</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #1f2933;
+        background: #f7f9fc;
+      }
+
+      body {
+        margin: 0;
+        background: #f7f9fc;
+      }
+
+      main {
+        width: min(880px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0;
+      }
+
+      header {
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.2;
+      }
+
+      p {
+        margin: 8px 0 0;
+        color: #52616b;
+      }
+
+      form {
+        display: grid;
+        gap: 18px;
+        border: 1px solid #d9e2ec;
+        border-radius: 8px;
+        background: #ffffff;
+        padding: 22px;
+      }
+
+      fieldset {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin: 0;
+        border: 0;
+        padding: 0;
+      }
+
+      legend {
+        grid-column: 1 / -1;
+        margin-bottom: 2px;
+        color: #102a43;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: #243b53;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      input,
+      select,
+      textarea {
+        box-sizing: border-box;
+        width: 100%;
+        border: 1px solid #bcccdc;
+        border-radius: 6px;
+        padding: 10px 11px;
+        color: #102a43;
+        font: inherit;
+        font-weight: 400;
+      }
+
+      textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+
+      .span-full {
+        grid-column: 1 / -1;
+      }
+
+      .danger-zone {
+        border-top: 1px solid #edf2f7;
+        padding-top: 18px;
+      }
+
+      button {
+        width: fit-content;
+        border: 0;
+        border-radius: 6px;
+        padding: 10px 14px;
+        background: #0f766e;
+        color: #ffffff;
+        font-weight: 700;
+      }
+
+      @media (max-width: 640px) {
+        fieldset {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>JobFill AI Manual Test Form</h1>
+        <p>Use this local page to verify scan, preview, and user-controlled autofill behavior.</p>
+      </header>
+
+      <form>
+        <fieldset>
+          <legend>Safe Profile Fields</legend>
+
+          <label for="full-name">
+            Full name
+            <input id="full-name" name="fullName" autocomplete="name">
+          </label>
+
+          <label for="email">
+            Email address
+            <input id="email" name="email" type="email" autocomplete="email">
+          </label>
+
+          <label for="phone">
+            Phone
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
+          </label>
+
+          <label for="linkedin">
+            LinkedIn profile
+            <input id="linkedin" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/example">
+          </label>
+
+          <label for="github">
+            GitHub profile
+            <input id="github" name="github" type="url" placeholder="https://github.com/example">
+          </label>
+
+          <label for="portfolio">
+            Portfolio URL
+            <input id="portfolio" name="portfolio" type="url" placeholder="https://example.dev">
+          </label>
+
+          <label for="school">
+            School
+            <input id="school" name="school">
+          </label>
+
+          <label for="degree">
+            Degree
+            <input id="degree" name="degree">
+          </label>
+
+          <label for="graduation-year">
+            Graduation year
+            <input id="graduation-year" name="graduationYear" inputmode="numeric" maxlength="4">
+          </label>
+
+          <label for="address" class="span-full">
+            Street address
+            <textarea id="address" name="address" autocomplete="street-address"></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset class="danger-zone">
+          <legend>Fields That Must Not Autofill</legend>
+
+          <label for="account-password">
+            Password
+            <input id="account-password" name="password" type="password" autocomplete="new-password">
+          </label>
+
+          <label for="ssn">
+            SSN/SIN
+            <input id="ssn" name="ssn" placeholder="Do not autofill">
+          </label>
+
+          <label for="salary-expectations">
+            Salary expectations
+            <input id="salary-expectations" name="salaryExpectations" placeholder="Do not autofill">
+          </label>
+
+          <label for="work-authorization">
+            Are you authorized to work in this country?
+            <select id="work-authorization" name="workAuthorization">
+              <option value="">Select one</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+              <option value="need-sponsorship">I need sponsorship</option>
+            </select>
+          </label>
+
+          <label for="demographics" class="span-full">
+            Demographic information
+            <textarea id="demographics" name="demographics" placeholder="Do not autofill"></textarea>
+          </label>
+        </fieldset>
+
+        <button type="button">Fake Submit Button</button>
+      </form>
+    </main>
+  </body>
+</html>

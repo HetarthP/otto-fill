@@ -24,15 +24,25 @@ function renderFields(fields) {
   fields.slice(0, 25).forEach((field) => {
     const item = document.createElement("li");
     const name = document.createElement("span");
+    const category = document.createElement("span");
     const meta = document.createElement("span");
 
     name.className = "field-name";
-    name.textContent = field.name;
+    name.textContent = field.displayName || "Unnamed field";
+
+    category.className = "field-category";
+    category.textContent = field.guessedCategory || "unknown";
 
     meta.className = "field-meta";
-    meta.textContent = `${field.tag}${field.type ? `:${field.type}` : ""}${field.required ? " · required" : ""}`;
+    meta.textContent = [
+      field.tagType,
+      field.inputType ? `type=${field.inputType}` : "",
+      field.id ? `id=${field.id}` : "",
+      field.name ? `name=${field.name}` : "",
+      field.required ? "required" : ""
+    ].filter(Boolean).join(" · ");
 
-    item.append(name, meta);
+    item.append(name, category, meta);
     fieldList.append(item);
   });
 

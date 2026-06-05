@@ -1,12 +1,12 @@
 # JobFill AI
 
-JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping with job application forms. This version stores a local profile, scans the active page for form fields, classifies obvious field types, and avoids external APIs.
+JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping with job application forms. This version stores a local profile, scans the active page for form fields, classifies obvious field types, previews high-confidence autofill targets, and avoids external APIs.
 
 ## What is included
 
 - `manifest.json`: Chrome Extension Manifest V3 configuration.
 - `src/background.js`: Extension service worker and message relay.
-- `src/content.js`: User-triggered page scanner and conservative field classifier for `input`, `textarea`, and `select` fields.
+- `src/content.js`: User-triggered page scanner, conservative field classifier, and guarded autofill handler for safe high-confidence fields.
 - `popup/popup.html`: Popup UI with scan and settings actions.
 - `popup/popup.css`: Popup styling.
 - `popup/popup.js`: Popup scan flow and result rendering.
@@ -20,8 +20,10 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 - The extension does not call external APIs.
 - The content script is injected only after the user selects **Scan Page**.
 - Field scanning happens only on the active tab selected by the user.
-- No autofill is performed yet.
+- Autofill happens only after the user selects **Autofill Page** in the popup.
+- Autofill is limited to previewed high-confidence fields with saved local profile values.
 - Field classification is local and rule-based.
+- Sensitive fields such as passwords, SSN/SIN, government IDs, payment information, salary expectations, legal authorization, and demographic questions are blocked.
 
 ## Manual setup
 
@@ -44,11 +46,23 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 9. Confirm the popup lists detected `input`, `textarea`, and `select` fields.
 10. Confirm obvious fields show conservative guessed categories such as `fullName`, `email`, `phone`, `linkedin`, `github`, `portfolio`, `address`, `school`, `degree`, or `graduationYear`.
 11. Confirm unclear fields show `unknown`.
-12. Confirm no fields are autofilled or modified after scanning.
-13. Try scanning a page where extensions cannot run, such as `chrome://extensions`, and confirm the popup shows an error instead of failing silently.
+12. Confirm the popup shows preview rows only for saved profile values in allowed autofill categories: `fullName`, `email`, `phone`, `linkedin`, `github`, `portfolio`, `school`, `degree`, and `graduationYear`.
+13. Confirm `address` is detected but not previewed for autofill.
+14. Confirm scanning alone does not modify any page fields.
+15. Select **Autofill Page** and confirm only previewed empty fields are filled.
+16. Confirm passwords, SSN/SIN, government IDs, payment information, salary expectations, legal authorization, and demographic fields are not filled.
+17. Try scanning a page where extensions cannot run, such as `chrome://extensions`, and confirm the popup shows an error instead of failing silently.
+
+## Remaining manual verification
+
+- Confirm behavior on real job application pages with custom or React-controlled inputs.
+- Confirm duplicate fields, such as email confirmation fields, behave as expected.
+- Confirm pages with iframes are handled acceptably, since cross-origin iframe fields are not reachable.
+- Confirm conservative classifier misses are acceptable before expanding any matching rules.
 
 ## Current limitations
 
-- This version only detects fields; it does not autofill yet.
+- This version autofills only a small set of high-confidence profile fields.
 - Field matching is intentionally conservative and may leave valid fields as `unknown`.
+- Address fields are intentionally excluded from autofill for now.
 - No external AI or network calls are used.

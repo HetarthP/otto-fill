@@ -59,6 +59,48 @@ if (!globalThis.jobfillContentScriptLoaded) {
     ]
   };
 
+  const AUTOFILL_CATEGORIES = new Set([
+    "fullName",
+    "email",
+    "phone",
+    "linkedin",
+    "github",
+    "portfolio",
+    "school",
+    "degree",
+    "graduationYear"
+  ]);
+
+  const SENSITIVE_FIELD_PATTERNS = [
+    /\bpassword\b/,
+    /\bpasscode\b/,
+    /\bssn\b/,
+    /\bsocial\s*security\b/,
+    /\bsin\b/,
+    /\bsocial\s*insurance\b/,
+    /\bgovernment\s*id\b/,
+    /\bnational\s*id\b/,
+    /\bdriver'?s?\s*license\b/,
+    /\bpassport\b/,
+    /\bcredit\s*card\b/,
+    /\bcard\s*number\b/,
+    /\bcvv\b/,
+    /\bcvc\b/,
+    /\bpayment\b/,
+    /\bsalary\b/,
+    /\bcompensation\b/,
+    /\bexpected\s*pay\b/,
+    /\bwork\s*authorization\b/,
+    /\bauthorized\s*to\s*work\b/,
+    /\bsponsorship\b/,
+    /\bvisa\b/,
+    /\brace\b/,
+    /\bethnicity\b/,
+    /\bgender\b/,
+    /\bveteran\b/,
+    /\bdisability\b/
+  ];
+
   function getFieldLabel(element) {
     if (element.id) {
       const explicitLabel = document.querySelector(`label[for="${CSS.escape(element.id)}"]`);
@@ -90,6 +132,11 @@ if (!globalThis.jobfillContentScriptLoaded) {
       field.ariaLabel,
       field.nearbyLabelText
     ].join(" "));
+  }
+
+  function isSensitiveField(field) {
+    const searchText = getSearchText(field);
+    return SENSITIVE_FIELD_PATTERNS.some((pattern) => pattern.test(searchText));
   }
 
   function guessFieldCategory(field) {
@@ -145,22 +192,93 @@ if (!globalThis.jobfillContentScriptLoaded) {
         nearbyLabelText: getFieldLabel(element),
         required: Boolean(element.required),
         disabled: Boolean(element.disabled),
-        visible: Boolean(element.offsetWidth || element.offsetHeight || element.getClientRects().length)
+        visible: Boolean(element.offsetWidth || element.offsetHeight || element.getClientRects().length),
+        hasValue: Boolean(element.value && element.value.trim())
       };
 
       field.displayName = getDisplayName(field);
       field.guessedCategory = guessFieldCategory(field);
+      field.isSensitive = isSensitiveField(field);
 
       return field;
     });
   }
 
+  function canAutofillElement(element, field, value) {
+    if (!AUTOFILL_CATEGORIES.has(field.guessedCategory)) {
+      return false;
+    }
+
+    if (!value || field.disabled || !field.visible || isSensitiveField(field)) {
+      return false;
+    }
+
+    if (element.value && element.value.trim()) {
+      return false;
+    }
+
+    if (field.tagType === "textarea") {
+      return true;
+    }
+
+    if (field.tagType === "select") {
+      return false;
+    }
+
+    if (field.tagType !== "input") {
+      return false;
+    }
+
+    return ["", "text", "email", "tel", "url", "search"].includes(field.inputType);
+  }
+
+  function autofillFields(fillPlan) {
+    const elements = Array.from(document.querySelectorAll("input, textarea, select"));
+    const scannedFields = scanPageFields();
+    const filled = [];
+    const skipped = [];
+
+    fillPlan.forEach((item) => {
+      const element = elements[item.index];
+      const field = scannedFields[item.index];
+
+      if (!element || !field || field.guessedCategory !== item.category) {
+        skipped.push({ ...item, reason: "Field changed before autofill." });
+        return;
+      }
+
+      if (!canAutofillElement(element, field, item.value)) {
+        skipped.push({ ...item, reason: "Field is not safe to autofill." });
+        return;
+      }
+
+      element.value = item.value;
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+      element.dispatchEvent(new Event("change", { bubbles: true }));
+      filled.push({
+        index: item.index,
+        category: item.category,
+        displayName: field.displayName
+      });
+    });
+
+    return { filled, skipped };
+  }
+
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (!message || message.type !== "JOBFILL_COLLECT_FIELDS") {
+    if (!message || !["JOBFILL_COLLECT_FIELDS", "JOBFILL_AUTOFILL_FIELDS"].includes(message.type)) {
       return false;
     }
 
     try {
+      if (message.type === "JOBFILL_AUTOFILL_FIELDS") {
+        sendResponse({
+          ok: true,
+          ...autofillFields(message.fillPlan || [])
+        });
+        return false;
+      }
+
       sendResponse({
         ok: true,
         fields: scanPageFields()

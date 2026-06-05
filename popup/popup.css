@@ -121,3 +121,11 @@ button.secondary:hover {
   display: block;
   color: #627d98;
 }
+
+.field-preview {
+  display: block;
+  margin-top: 6px;
+  color: #334e68;
+  font-size: 12px;
+  font-weight: 700;
+}

@@ -13,6 +13,8 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 - `options/options.html`: Profile settings page.
 - `options/options.css`: Options page styling.
 - `options/options.js`: Profile persistence with `chrome.storage.local` and local PDF resume import.
+- `src/fieldRules.js`: Shared classification and autofill safety rules.
+- `tests/fieldRules.test.js`: Lightweight Node tests for classification and autofill safety.
 
 ## Privacy model
 
@@ -34,6 +36,16 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 3. Select **Load unpacked**.
 4. Choose this project folder.
 5. Pin or open the JobFill AI extension from the toolbar.
+
+## Automated tests
+
+Run the local test suite with:
+
+```bash
+npm test
+```
+
+The tests cover conservative field classification and autofill safety blocking for sensitive fields.
 
 ## Manual test steps
 

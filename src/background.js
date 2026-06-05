@@ -29,7 +29,7 @@ async function injectAndScanTab(tabId, sendResponse) {
     // Inject only after the user clicks Scan Page, keeping page access explicit.
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ["src/content.js"]
+      files: ["src/fieldRules.js", "src/content.js"]
     });
 
     chrome.tabs.sendMessage(tabId, { type: "JOBFILL_COLLECT_FIELDS" }, (response) => {

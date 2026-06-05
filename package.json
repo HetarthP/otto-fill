@@ -1,0 +1,8 @@
+{
+  "name": "jobfill-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node tests/fieldRules.test.js"
+  }
+}

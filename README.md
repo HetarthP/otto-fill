@@ -1,6 +1,6 @@
 # JobFill AI
 
-JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping with job application forms. This version stores a local profile, scans the active page for form fields, classifies obvious field types, previews high-confidence autofill targets, and avoids external APIs.
+JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping with job application forms. This version stores a local profile, scans the active page for form fields, classifies obvious field types, previews high-confidence autofill targets, imports PDF resumes locally, and avoids external APIs.
 
 ## What is included
 
@@ -12,7 +12,7 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 - `popup/popup.js`: Popup scan flow and result rendering.
 - `options/options.html`: Profile settings page.
 - `options/options.css`: Options page styling.
-- `options/options.js`: Profile persistence with `chrome.storage.local`.
+- `options/options.js`: Profile persistence with `chrome.storage.local` and local PDF resume import.
 
 ## Privacy model
 
@@ -23,6 +23,8 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 - Autofill happens only after the user selects **Autofill Page** in the popup.
 - Autofill is limited to previewed high-confidence fields with saved local profile values.
 - Field classification is local and rule-based.
+- Resume PDF parsing runs locally in the options page. PDF bytes are not stored.
+- Extracted resume values are previewed before applying, and profile storage is updated only after selecting **Save Profile**.
 - Sensitive fields such as passwords, SSN/SIN, government IDs, payment information, salary expectations, legal authorization, and demographic questions are blocked.
 
 ## Manual setup
@@ -47,11 +49,18 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 10. Confirm obvious fields show conservative guessed categories such as `fullName`, `email`, `phone`, `linkedin`, `github`, `portfolio`, `address`, `school`, `degree`, or `graduationYear`.
 11. Confirm unclear fields show `unknown`.
 12. Confirm the popup shows preview rows only for saved profile values in allowed autofill categories: `fullName`, `email`, `phone`, `linkedin`, `github`, `portfolio`, `school`, `degree`, and `graduationYear`.
-13. Confirm `address` is detected but not previewed for autofill.
-14. Confirm scanning alone does not modify any page fields.
-15. Select **Autofill Page** and confirm only previewed empty fields are filled.
-16. Confirm passwords, SSN/SIN, government IDs, payment information, salary expectations, legal authorization, and demographic fields are not filled.
-17. Try scanning a page where extensions cannot run, such as `chrome://extensions`, and confirm the popup shows an error instead of failing silently.
+13. Uncheck one preview row and confirm **Autofill Page** fills only the rows that remain checked.
+14. Uncheck all preview rows and confirm autofill is disabled or blocked.
+15. Confirm `address` is detected but not previewed for autofill.
+16. Confirm scanning alone does not modify any page fields.
+17. Select **Autofill Page** and confirm only checked previewed empty fields are filled.
+18. Confirm passwords, SSN/SIN, government IDs, payment information, salary expectations, legal authorization, and demographic fields are not filled.
+19. Open **Profile Settings**, choose a text-based PDF resume, and confirm extracted values appear in the preview before anything is saved.
+20. Select **Apply to Profile Form** and confirm the extracted values appear in the form.
+21. If existing form values would be changed, confirm the overwrite prompt appears.
+22. Select **Save Profile**, close and reopen settings, then confirm applied values persist.
+23. Try an image-only or complex PDF and confirm the extension reports missing readable text or shows limited extraction without sending data anywhere.
+24. Try scanning a page where extensions cannot run, such as `chrome://extensions`, and confirm the popup shows an error instead of failing silently.
 
 ## Remaining manual verification
 
@@ -59,10 +68,13 @@ JobFill AI is a privacy-first Chrome Extension Manifest V3 project for helping w
 - Confirm duplicate fields, such as email confirmation fields, behave as expected.
 - Confirm pages with iframes are handled acceptably, since cross-origin iframe fields are not reachable.
 - Confirm conservative classifier misses are acceptable before expanding any matching rules.
+- Confirm resume parsing accuracy across common resume PDF generators.
 
 ## Current limitations
 
 - This version autofills only a small set of high-confidence profile fields.
 - Field matching is intentionally conservative and may leave valid fields as `unknown`.
 - Address fields are intentionally excluded from autofill for now.
+- Resume import supports text-based PDFs best; scanned/image-only PDFs may not parse.
+- Extracted education and experience are previewed, but only existing profile fields are saved.
 - No external AI or network calls are used.

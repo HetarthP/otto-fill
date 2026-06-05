@@ -123,9 +123,16 @@ button.secondary:hover {
 }
 
 .field-preview {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   margin-top: 6px;
   color: #334e68;
   font-size: 12px;
   font-weight: 700;
+}
+
+.field-preview input {
+  width: auto;
+  margin: 0;
 }

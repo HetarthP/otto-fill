@@ -66,6 +66,25 @@
           </label>
         </section>
 
+        <section class="resume-import" aria-label="Resume import">
+          <h2>Resume Import</h2>
+          <p>Select a PDF resume to parse locally. Review extracted values before applying them.</p>
+
+          <label>
+            PDF resume
+            <input id="resume-file" type="file" accept="application/pdf">
+          </label>
+
+          <div id="resume-preview" class="resume-preview" hidden>
+            <h3>Extracted Preview</h3>
+            <dl id="resume-preview-list"></dl>
+            <div class="form-actions">
+              <button id="apply-resume" type="button">Apply to Profile Form</button>
+              <button id="clear-resume" type="button" class="secondary">Clear Resume Preview</button>
+            </div>
+          </div>
+        </section>
+
         <div class="form-actions">
           <button type="submit">Save Profile</button>
           <button id="clear-profile" type="button" class="secondary">Clear Profile</button>

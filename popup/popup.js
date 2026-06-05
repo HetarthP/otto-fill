@@ -18,6 +18,7 @@ const statusElement = document.getElementById("status");
 const fieldList = document.getElementById("field-list");
 let currentTabId = null;
 let currentFillPlan = [];
+let selectedFillIndexes = new Set();
 
 function setStatus(message) {
   statusElement.textContent = message;
@@ -25,6 +26,10 @@ function setStatus(message) {
 
 function clearFields() {
   fieldList.replaceChildren();
+}
+
+function updateAutofillButton() {
+  autofillButton.disabled = selectedFillIndexes.size === 0;
 }
 
 function maskValue(value) {
@@ -76,9 +81,11 @@ function buildFillPlan(fields, profile) {
 
 function renderFields(fields, fillPlan) {
   clearFields();
+  selectedFillIndexes = new Set(fillPlan.map((item) => item.index));
 
   if (!fields.length) {
     setStatus("No input, textarea, or select fields found.");
+    updateAutofillButton();
     return;
   }
 
@@ -115,14 +122,32 @@ function renderFields(fields, fillPlan) {
 
     if (fillIndexes.has(field.index)) {
       const fillItem = fillPlan.find((item) => item.index === field.index);
+      const checkbox = document.createElement("input");
+      const previewText = document.createElement("span");
+
       preview.className = "field-preview";
-      preview.textContent = `Preview: ${fillItem.category} -> ${maskValue(fillItem.value)}`;
+      checkbox.type = "checkbox";
+      checkbox.checked = true;
+      checkbox.value = String(field.index);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          selectedFillIndexes.add(field.index);
+        } else {
+          selectedFillIndexes.delete(field.index);
+        }
+
+        updateAutofillButton();
+      });
+
+      previewText.textContent = `Preview: ${fillItem.category} -> ${maskValue(fillItem.value)}`;
+      preview.append(checkbox, previewText);
       item.append(preview);
     }
 
     fieldList.append(item);
   });
 
+  updateAutofillButton();
 }
 
 async function getActiveTab() {
@@ -139,6 +164,7 @@ async function scanCurrentPage() {
   clearFields();
   currentTabId = null;
   currentFillPlan = [];
+  selectedFillIndexes = new Set();
   scanButton.disabled = true;
   autofillButton.disabled = true;
   setStatus("Scanning page...");
@@ -177,6 +203,14 @@ async function autofillCurrentPage() {
     return;
   }
 
+  const selectedFillPlan = currentFillPlan.filter((item) => selectedFillIndexes.has(item.index));
+
+  if (!selectedFillPlan.length) {
+    setStatus("Select at least one previewed field before autofilling.");
+    updateAutofillButton();
+    return;
+  }
+
   autofillButton.disabled = true;
   setStatus("Autofilling previewed fields...");
 
@@ -190,7 +224,7 @@ async function autofillCurrentPage() {
     const response = await chrome.runtime.sendMessage({
       type: "JOBFILL_AUTOFILL_PAGE",
       tabId: currentTabId,
-      fillPlan: currentFillPlan
+      fillPlan: selectedFillPlan
     });
 
     if (!response || !response.ok) {
@@ -200,6 +234,7 @@ async function autofillCurrentPage() {
     const filledCount = response.filled?.length || 0;
     const skippedCount = response.skipped?.length || 0;
     currentFillPlan = [];
+    selectedFillIndexes = new Set();
     setStatus(`Autofilled ${filledCount} field${filledCount === 1 ? "" : "s"}. ${skippedCount} skipped.`);
   } catch (error) {
     setStatus(error instanceof Error ? error.message : "Autofill failed.");
